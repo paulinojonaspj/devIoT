@@ -1,0 +1,125 @@
+<div class="row">
+  <h3 class="mt-4 mb-4">Dashboard de consumos</h3>
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-4">
+      <div class="form-floating">
+        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+
+          <option>2024</option>
+        </select>
+        <label for="floatingSelect">Ano</label>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="form-floating">
+        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+
+          <option>Janeiro</option>
+          <option>Fevereiro</option>
+          <option>Março</option>
+          <option>Abril</option>
+          <option>Maio</option>
+          <option>Junho</option>
+          <option>Julho</option>
+          <option>Agosto</option>
+          <option>Setembro</option>
+          <option>Outubro</option>
+          <option>Novembro</option>
+          <option>Dezembro</option>
+        </select>
+        <label for="floatingSelect">Mes</label>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 row" style="border-right: solid 2px green;margin-top: 20px;">
+    <h4 style="text-align: center;">CONSUMO ATUAL</h4>
+    <div class="col-md-6">
+      <div #chartGaugeAgua style="width: 100%; height: 300px;"></div>
+
+    </div>
+
+    <div class="col-md-6">
+      <div #chartGaugeEnergia style="width: 100%; height: 300px;"></div>
+
+    </div>
+  </div>
+  <div class="col-md-6 row">
+    <h4 style="text-align: center;">CONSUMO PREVISTO</h4>
+    <div class="col-md-6">
+      <div #chartGaugePrevistoAgua style="width: 100%; height: 300px;"></div>
+    </div>
+
+    <div class="col-md-6">
+      <div #chartGaugePrevistoEnergia style="width: 100%; height: 300px;"></div>
+    </div>
+  </div>
+
+
+
+  <div class="col-md-12">
+    <div #chartDiarioMensal style="width: 100%; height: 300px;"></div>
+  </div>
+  <div class="row" style="margin-top: 30px;">
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-responsive table-bordered">
+          <thead>
+            <th colspan="3">CONSUMO - ÁGUA</th>
+          </thead>
+          <thead>
+
+            <th>Local</th>
+            <th>Consumo / Previsto</th>
+            <th>Faturação / Previsto</th>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>WC</td>
+              <td>5 Litros</td>
+              <td>4 &euro;</td>
+            </tr>
+            <tr>
+              <td>TOTAL</td>
+              <td>5 kWh</td>
+              <td>4 &euro;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-6">
+        <table class="table table-responsive table-bordered">
+          <thead>
+            <th colspan="3">CONSUMO ENERGIA</th>
+          </thead>
+          <thead>
+
+            <th>Local</th>
+            <th>Consumo / Previsto</th>
+            <th>Faturação / Previsto</th>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>WC</td>
+              <td>5 kWh</td>
+              <td>4 &euro;</td>
+            </tr>
+
+            <tr>
+              <td>TOTAL</td>
+              <td>5 kWh</td>
+              <td>4 &euro;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-md-12" style="margin-top: 30px;">
+    <div #chartAnual style="width: 100%; height: 300px;"></div>
+  </div>
+</div>
