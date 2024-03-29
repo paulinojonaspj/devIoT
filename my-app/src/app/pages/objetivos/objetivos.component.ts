@@ -19,6 +19,8 @@ export class ObjetivosComponent implements OnInit {
   objetivos: Objetivo[] = [];
   filtroObjetivosAgua?: Objetivo;
   filtroObjetivosEnergia?: Objetivo;
+  totalEnergia = 0;
+  totalAgua = 0;
   @ViewChild('btnFechar') btnFechar!: ElementRef;
 
   private serviceBase = inject(BaseService);
@@ -53,6 +55,37 @@ export class ObjetivosComponent implements OnInit {
       this.objetivos = res;
       this.filtroObjetivosAgua = this.objetivos.filter(item => item.ano == this.ano && item.tipo === "AGUA")[0] ?? [];
       this.filtroObjetivosEnergia = this.objetivos.filter(item => item.ano == this.ano && item.tipo === "ENERGIA")[0] ?? [];
+
+
+
+      this.totalEnergia += this.filtroObjetivosEnergia?.janeiro || 0; // Adiciona o valor de janeiro ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.fevereiro || 0; // Adiciona o valor de fevereiro ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.marco || 0; // Adiciona o valor de março ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.abril || 0; // Adiciona o valor de abril ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.maio || 0; // Adiciona o valor de maio ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.junho || 0; // Adiciona o valor de junho ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.julho || 0; // Adiciona o valor de julho ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.agosto || 0; // Adiciona o valor de agosto ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.setembro || 0; // Adiciona o valor de setembro ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.outubro || 0; // Adiciona o valor de outubro ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.novembro || 0; // Adiciona o valor de novembro ao totalEnergia, se existir, caso contrário, adiciona zero.
+      this.totalEnergia += this.filtroObjetivosEnergia?.dezembro || 0; // Adiciona o valor de dezembro ao totalEnergia, se existir, caso contrário, adiciona zero.
+
+
+
+      this.totalAgua += this.filtroObjetivosAgua?.janeiro || 0; // Adiciona o valor de janeiro ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.fevereiro || 0; // Adiciona o valor de fevereiro ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.marco || 0; // Adiciona o valor de março ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.abril || 0; // Adiciona o valor de abril ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.maio || 0; // Adiciona o valor de maio ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.junho || 0; // Adiciona o valor de junho ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.julho || 0; // Adiciona o valor de julho ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.agosto || 0; // Adiciona o valor de agosto ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.setembro || 0; // Adiciona o valor de setembro ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.outubro || 0; // Adiciona o valor de outubro ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.novembro || 0; // Adiciona o valor de novembro ao totalAgua, se existir, caso contrário, adiciona zero.
+      this.totalAgua += this.filtroObjetivosAgua?.dezembro || 0; // Adiciona o valor de dezembro ao totalAgua, se existir, caso contrário, adiciona zero.
+
     });
   }
 
@@ -89,5 +122,6 @@ export class ObjetivosComponent implements OnInit {
     });
 
   }
+
 
 }

@@ -1,20 +1,21 @@
 <div class="row">
-  <h3 class="mt-4 mb-4">Dashboard de consumos</h3>
-  <div class="row">
+  <div class="row mt-1">
     <div class="col-2"></div>
     <div class="col-4">
       <div class="form-floating">
-        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+        <select [(ngModel)]="ano" class="form-select" id="floatingSelect" (change)="filtrar()"
+          aria-label="Floating label select example">
 
           <option>2024</option>
+          <option>2025</option>
         </select>
         <label for="floatingSelect">Ano</label>
       </div>
     </div>
     <div class="col-4">
       <div class="form-floating">
-        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-
+        <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="filtrar()"
+          [(ngModel)]="mes">
           <option>Janeiro</option>
           <option>Fevereiro</option>
           <option>Março</option>
@@ -32,8 +33,8 @@
       </div>
     </div>
   </div>
-  <div class="col-md-6 row" style="border-right: solid 2px green;margin-top: 20px;">
-    <h4 style="text-align: center;">CONSUMO ATUAL</h4>
+  <div class="col-md-6 row" style="border-right: solid 2px green; margin-top: 20px;  ">
+    <h6 style="text-align: center;">FATURAÇÃO ATUAL</h6>
     <div class="col-md-6">
       <div #chartGaugeAgua style="width: 100%; height: 300px;"></div>
 
@@ -44,82 +45,126 @@
 
     </div>
   </div>
-  <div class="col-md-6 row">
-    <h4 style="text-align: center;">CONSUMO PREVISTO</h4>
+  <div class="col-md-6 row" style=" margin-top: 20px; ">
+    <h6 style="text-align: center;">FATURAÇÃO PREVISTA</h6>
     <div class="col-md-6">
       <div #chartGaugePrevistoAgua style="width: 100%; height: 300px;"></div>
     </div>
 
     <div class="col-md-6">
-      <div #chartGaugePrevistoEnergia style="width: 100%; height: 300px;"></div>
+      <div #chartGaugePrevistoEnergia style="width: 100%; height: 300px; "></div>
     </div>
   </div>
 
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table-sm table-bordered" style="font-size: 10pt; width: 100%;">
+          <thead>
+            <th colspan="3">CONSUMO - ÁGUA <br>
+              <span>Preço Fixo Mês: {{ precoFixoAgua.toLocaleString() }} &euro; --- Preço Consumo / m<sup>3</sup>: {{
+                precoConsumoAgua.toLocaleString() }} &euro;</span>
+            </th>
+          </thead>
+          <thead>
+
+            <th>Local</th>
+            <th>Consumo</th>
 
 
+            <th>Faturação</th>
+          </thead>
+
+          <tbody>
+            @for(consumo of consumoAguaTable;track consumo){
+            <tr>
+              <td>{{ consumo.localizacao }}</td>
+              <td>Atual: {{ consumo.quantidade.toLocaleString() }} L<br>Média: {{
+                (consumo.quantidade/diaAtual).toLocaleString() }} L</td>
+
+              <td>Atual: {{ (consumo.quantidade* precoConsumoAgua/1000).toLocaleString() }} &euro;<br>
+                Previsto: {{ ((((consumo.quantidade* precoConsumoAgua)/diaAtual)*diasMes)/1000).toLocaleString() }}
+                &euro;</td>
+            </tr>
+            }
+            <tr>
+              <td>TOTAL</td>
+              <td>Atual: {{ calcularTotalConsumoAgua.toLocaleString() }} L<br>
+                Média: {{ (calcularTotalConsumoAgua/diaAtual).toLocaleString() }} L</td>
+
+              <td>Atual: {{ ((calcularTotalConsumoAgua* precoConsumoAgua)/1000 + precoFixoAgua).toLocaleString() }}
+                &euro;
+                <br>
+                Previsto: {{ (((((calcularTotalConsumoAgua*precoConsumoAgua)/diaAtual)/1000)*diasMes) +
+                precoFixoAgua).toLocaleString() }} &euro;
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">OBJETIVO</td>
+
+              <td>{{ objetivoAgua.toLocaleString() }} &euro;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-6">
+        <table class="table-sm  table-bordered" style="font-size: 10pt; width: 100%;">
+          <thead>
+            <th colspan="3">CONSUMO ENERGIA<br>
+              <span>Preço Fixo Mês: {{ precoFixoEnergia.toLocaleString() }} &euro; --- Preço Consumo / kWh: {{
+                precoConsumoEnergia.toLocaleString() }} &euro;</span>
+            </th>
+          </thead>
+          <thead>
+
+            <th>Local</th>
+            <th>Consumo</th>
+            <th>Faturação</th>
+          </thead>
+
+          <tbody>
+            @for(consumo of consumoEnergiaTable;track consumo){
+            <tr>
+              <td>{{ consumo.localizacao }}</td>
+              <td>Atual: {{ (consumo.quantidade/3600).toLocaleString() }} kWh<br>Média: {{ ((consumo.quantidade/3600)/
+                diaAtual).toLocaleString() }} kWh</td>
+              <td>Atual: {{(consumo.quantidade/3600* precoConsumoEnergia).toLocaleString() }} &euro;<br>
+                Previsto: {{ (((consumo.quantidade/3600* precoConsumoEnergia)/diaAtual)*diasMes).toLocaleString() }}
+                &euro;
+              </td>
+            </tr>
+            }
+
+            <tr>
+              <td>TOTAL</td>
+              <td>Atual: {{ calcularTotalConsumoEnergia.toLocaleString() }} kWh<br>
+                Média: {{ (calcularTotalConsumoEnergia/ diaAtual) .toLocaleString() }} kWh
+              </td>
+              <td>Atual:{{ ((calcularTotalConsumoEnergia* precoConsumoEnergia) + precoFixoEnergia).toLocaleString() }}
+                &euro;<br>
+                Previsto:{{ ((((calcularTotalConsumoEnergia* precoConsumoEnergia)/ diaAtual)* diasMes) +
+                precoFixoEnergia).toLocaleString() }} &euro;
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">OBJETIVO</td>
+
+              <td>{{ objetivoEnergia.toLocaleString() }} &euro;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <!--
   <div class="col-md-12">
     <div #chartDiarioMensal style="width: 100%; height: 300px;"></div>
   </div>
-  <div class="row" style="margin-top: 30px;">
-    <div class="row">
-      <div class="col-md-6">
-        <table class="table table-responsive table-bordered">
-          <thead>
-            <th colspan="3">CONSUMO - ÁGUA</th>
-          </thead>
-          <thead>
 
-            <th>Local</th>
-            <th>Consumo / Previsto</th>
-            <th>Faturação / Previsto</th>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>WC</td>
-              <td>5 Litros</td>
-              <td>4 &euro;</td>
-            </tr>
-            <tr>
-              <td>TOTAL</td>
-              <td>5 kWh</td>
-              <td>4 &euro;</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="col-md-6">
-        <table class="table table-responsive table-bordered">
-          <thead>
-            <th colspan="3">CONSUMO ENERGIA</th>
-          </thead>
-          <thead>
-
-            <th>Local</th>
-            <th>Consumo / Previsto</th>
-            <th>Faturação / Previsto</th>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>WC</td>
-              <td>5 kWh</td>
-              <td>4 &euro;</td>
-            </tr>
-
-            <tr>
-              <td>TOTAL</td>
-              <td>5 kWh</td>
-              <td>4 &euro;</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div>
   <div class="col-md-12" style="margin-top: 30px;">
     <div #chartAnual style="width: 100%; height: 300px;"></div>
   </div>
+  -->
 </div>

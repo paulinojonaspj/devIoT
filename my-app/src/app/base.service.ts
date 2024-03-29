@@ -2,6 +2,9 @@ import { inject, Injectable } from '@angular/core';
 import { ObjetivoService } from './pages/objetivos/objetivo.service';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ContratoService } from './pages/contratos/contrato.service';
+import { IUtilizador } from './pages/contratos/IUtilizador';
+import { ResumoService } from './pages/resumo/resumo.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +12,9 @@ import { Observable } from 'rxjs';
 export class BaseService {
 
   objetivoService = inject(ObjetivoService);
+  contratoService = inject(ContratoService);
+  resumoService = inject(ResumoService);
+
   http = inject(HttpClient);
   constructor() { }
 
@@ -19,6 +25,9 @@ export class BaseService {
   getCodigoPostal(codigo: string) {
     return this.http.get<any>("https://json.geoapi.pt/cp/" + codigo)
   }
+
+
+
 }
 
 

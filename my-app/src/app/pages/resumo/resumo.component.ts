@@ -3,16 +3,56 @@ import { LoginServiceService } from '../login/login-service.service';
 import { HighchartsChartModule } from 'highcharts-angular';
 import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more';
+import { FormsModule } from '@angular/forms';
+import { Objetivo } from '../objetivos/objetivo';
+import { BaseService } from '../../base.service';
+import { Consumo } from './resumo.service';
+import { replaceDecimalSeparator } from '../../pipe';
+import { CommonModule } from '@angular/common';
+import { IUtilizador } from '../contratos/IUtilizador';
 
 @Component({
   selector: 'app-resumo',
   standalone: true,
-  imports: [HighchartsChartModule, HighchartsChartModule],
+  imports: [HighchartsChartModule, HighchartsChartModule, FormsModule, replaceDecimalSeparator, CommonModule],
   templateUrl: './resumo.component.html',
   styleUrl: './resumo.component.css'
 })
 export class ResumoComponent implements OnInit {
   barras: typeof Highcharts = Highcharts;
+
+  ano = 2024;
+  mes = this.obterMesAtual();
+  // Obtém a data atual
+  dataAtual = new Date();
+  // Obtém o dia do mês
+  diaAtual = this.dataAtual?.getDate();
+
+  ultimaDataDoMes = new Date(this.ano, this.mesParaNumeroInteiro(this.mes), 0);
+  // Obtém o dia do mês da última data
+  diasMes = this.ultimaDataDoMes.getDate();
+
+
+  objetivos: Objetivo[] = [];
+  filtroObjetivosAgua?: Objetivo;
+  filtroObjetivosEnergia?: Objetivo;
+  consumoAguaTable: Consumo[] = [];
+  consumoEnergiaTable: Consumo[] = [];
+  realizacaoAgua = 0;
+  realizacaoEnergia = 0;
+  previstoAgua = 0;
+  previstoEnergia = 0;
+  objetivoAgua = 0;
+  objetivoEnergia = 0;
+
+  faturacaoAgua = 0;
+  faturacaoEnergia = 0;
+
+  precoConsumoAgua = 0;
+  precoConsumoEnergia = 0;
+
+  precoFixoAgua = 0;
+  precoFixoEnergia = 0;
 
   chartOptions: Highcharts.Options = {};
 
@@ -24,43 +64,162 @@ export class ResumoComponent implements OnInit {
   @ViewChild('chartGaugePrevistoEnergia', { static: true }) chartGaugePrevistoEnergia!: ElementRef;
 
   authservice = inject(LoginServiceService);
+  private serviceBase = inject(BaseService);
 
   constructor() {
-    this.authservice.getUses().subscribe(res => {
-      console.log(res);
-    })
+
   }
   ngOnInit(): void {
     HighchartsMore(Highcharts);
-    this.initChart();
+
+    setInterval(()=>{
+      this.filtrar();
+    },3000)
 
   }
 
+  filtrar() {
+    this.serviceBase.contratoService.getUtilizador().subscribe(res => {
+      this.precoConsumoEnergia = this.calcularPrecoEnergia(res);
+      this.precoFixoEnergia = res.precoFixoEnergia;
+      this.precoConsumoAgua = res.precoAgua;
+      this.precoFixoAgua = res.precoFixoAgua;
+
+
+      this.serviceBase.objetivoService.getObjetivos().subscribe(res => {
+        this.objetivos = res;
+        this.filtroObjetivosAgua = this.objetivos.filter(item => item.ano == this.ano && item.tipo === "AGUA")[0] ?? [];
+        this.filtroObjetivosEnergia = this.objetivos.filter(item => item.ano == this.ano && item.tipo === "ENERGIA")[0] ?? [];
+
+        this.serviceBase.resumoService.getConsumo(this.ano + "-" + this.mesParaNumero(this.mes)).subscribe(res => {
+          this.objetivoAgua = this.getObjetivoAgua();
+          this.objetivoEnergia = this.getObjetivoEnergia();
+
+          this.consumoAguaTable = res.filter(objeto => objeto.tipo === 'AGUA');
+          this.consumoEnergiaTable = res.filter(objeto => objeto.tipo === 'ENERGIA');
+
+          this.initChart();
+
+        });
+
+      });
+    });
+  }
+
+  getObjetivoAgua() {
+    if (this.mes === "Janeiro") {
+      return this.filtroObjetivosAgua?.janeiro || 0;
+    }
+
+    if (this.mes === "Fevereiro") {
+      return this.filtroObjetivosAgua?.fevereiro || 0;
+    }
+
+    if (this.mes === "Março") {
+      return this.filtroObjetivosAgua?.marco || 0;
+    }
+    if (this.mes === "Abril") {
+      return this.filtroObjetivosAgua?.abril || 0;
+    }
+    if (this.mes === "Maio") {
+      return this.filtroObjetivosAgua?.maio || 0;
+    }
+    if (this.mes === "Junho") {
+      return this.filtroObjetivosAgua?.junho || 0;
+    }
+    if (this.mes === "Julho") {
+      return this.filtroObjetivosAgua?.julho || 0;
+    }
+    if (this.mes === "Agosto") {
+      return this.filtroObjetivosAgua?.agosto || 0;
+    }
+    if (this.mes === "Setembro") {
+      return this.filtroObjetivosAgua?.setembro || 0;
+    }
+    if (this.mes === "Outubro") {
+      return this.filtroObjetivosAgua?.outubro || 0;
+    }
+    if (this.mes === "Novembro") {
+      return this.filtroObjetivosAgua?.novembro || 0;
+    }
+    if (this.mes === "Dezembro") {
+      return this.filtroObjetivosAgua?.dezembro || 0;
+    }
+
+    return 0;
+  }
+
+
+  getObjetivoEnergia() {
+    if (this.mes === "Janeiro") {
+      return this.filtroObjetivosEnergia?.janeiro || 0;
+    }
+
+    if (this.mes === "Fevereiro") {
+      return this.filtroObjetivosEnergia?.fevereiro || 0;
+    }
+
+    if (this.mes === "Março") {
+      return this.filtroObjetivosEnergia?.marco || 0;
+    }
+    if (this.mes === "Abril") {
+      return this.filtroObjetivosEnergia?.abril || 0;
+    }
+    if (this.mes === "Maio") {
+      return this.filtroObjetivosEnergia?.maio || 0;
+    }
+    if (this.mes === "Junho") {
+      return this.filtroObjetivosEnergia?.junho || 0;
+    }
+    if (this.mes === "Julho") {
+      return this.filtroObjetivosEnergia?.julho || 0;
+    }
+    if (this.mes === "Agosto") {
+      return this.filtroObjetivosEnergia?.agosto || 0;
+    }
+    if (this.mes === "Setembro") {
+      return this.filtroObjetivosEnergia?.setembro || 0;
+    }
+    if (this.mes === "Outubro") {
+      return this.filtroObjetivosEnergia?.outubro || 0;
+    }
+    if (this.mes === "Novembro") {
+      return this.filtroObjetivosEnergia?.novembro || 0;
+    }
+    if (this.mes === "Dezembro") {
+      return this.filtroObjetivosEnergia?.dezembro || 0;
+    }
+
+    return 0;
+  }
+
   initChart(): void {
-    Highcharts.chart(this.chartDiarioMensal.nativeElement, this.opcoesDiario("Consumo diário"));
-
-
-
-    this.chartOptions = this.opcoesGauge("ÁGUA");
+    this.chartOptions = this.opcoesGauge("<span style='font-size:10pt'>ÁGUA</span>", this.objetivoAgua, (this.calcularTotalConsumoAgua/1000 * this.precoConsumoAgua + this.precoFixoAgua));
     Highcharts.chart(this.chartGaugeAgua.nativeElement, this.chartOptions);
 
-    this.chartOptions = this.opcoesGauge("ENERGIA");
+
+
+    this.chartOptions = this.opcoesGauge("<span style='font-size:10pt'>ENERGIA</span>", this.objetivoEnergia, (this.calcularTotalConsumoEnergia * this.precoConsumoEnergia + this.precoFixoEnergia));
     Highcharts.chart(this.chartGaugeEnergia.nativeElement, this.chartOptions);
 
 
-    this.chartOptions = this.opcoesGauge("ÁGUA");
+    this.chartOptions = this.opcoesGauge("<span style='font-size:10pt'>ÁGUA</span>", this.objetivoAgua, (((this.calcularTotalConsumoAgua/1000 * this.precoConsumoAgua) / this.diaAtual) * this.diasMes)+ this.precoFixoAgua);
     Highcharts.chart(this.chartGaugePrevistoAgua.nativeElement, this.chartOptions);
 
 
-    this.chartOptions = this.opcoesGauge("ENERGIA");
+    this.chartOptions = this.opcoesGauge("<span style='font-size:10pt'>ENERGIA</span>", this.objetivoEnergia, (((this.calcularTotalConsumoEnergia * this.precoConsumoEnergia) / this.diaAtual) * this.diasMes) + this.precoFixoEnergia);
     Highcharts.chart(this.chartGaugePrevistoEnergia.nativeElement, this.chartOptions);
+
+
+    Highcharts.chart(this.chartDiarioMensal.nativeElement, this.opcoesDiario("Consumo diário"));
+
 
     this.chartOptions = this.opcoes();
     Highcharts.chart(this.chartAnual.nativeElement, this.chartOptions);
 
   }
 
-  opcoesGauge(titulo: string): any {
+  opcoesGauge(titulo: string, objetivo: number, faturacao: number): any {
     return {
       chart: {
         type: 'gauge',
@@ -74,7 +233,6 @@ export class ResumoComponent implements OnInit {
       title: {
         text: titulo
       },
-
       pane: {
         startAngle: -90,
         endAngle: 89.9,
@@ -102,16 +260,16 @@ export class ResumoComponent implements OnInit {
         lineWidth: 0,
         plotBands: [{
           from: 0,
-          to: 120,
+          to: 100,
           color: '#55BF3B', // green
           thickness: 20
         }, {
-          from: 120,
-          to: 160,
+          from: 100,
+          to: 150,
           color: '#DDDF0D', // yellow
           thickness: 20
         }, {
-          from: 160,
+          from: 150,
           to: 200,
           color: '#DF5353', // red
           thickness: 20
@@ -119,7 +277,7 @@ export class ResumoComponent implements OnInit {
       },
       series: [{
         name: titulo,
-        data: [80],
+        data: [parseFloat(((faturacao*100)/objetivo).toFixed(2))],
         tooltip: {
           valueSuffix: ' %'
         },
@@ -151,6 +309,7 @@ export class ResumoComponent implements OnInit {
 
     };
   }
+
   opcoes(): Highcharts.Options {
     return {
       chart: {
@@ -201,13 +360,13 @@ export class ResumoComponent implements OnInit {
         {
           type: "column",
           name: 'ÁGUA',
-          data: [10, 23, 44,0,0,0,0,0,0,0,0,0]
+          data: [10, 23, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
         },
         {
           type: "column",
           name: 'ENERGIA',
-          data: [4, 34, 22,9,8,9,9,8,9,0,9,8]
+          data: [4, 34, 22, 9, 8, 9, 9, 8, 9, 0, 9, 8]
 
         }
       ],
@@ -284,6 +443,78 @@ export class ResumoComponent implements OnInit {
           }
         }, 1.6, 3.3, 5.9, 10.5, 13.5, 14.5, 14.4, 11.5, 8.7, 4.7, 2.6]
       }]
+    }
+  }
+
+  obterMesAtual(): string {
+    const meses = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+
+    const dataAtual = new Date();
+    const mesAtual = dataAtual.getMonth(); // Retorna o índice do mês (0-11)
+
+    return meses[mesAtual];
+  }
+
+  mesParaNumero(mes: string): string | undefined {
+    const meses: { [key: string]: string } = {
+      'Janeiro': "01",
+      'Fevereiro': "02",
+      'Março': "03",
+      'Abril': "04",
+      'Maio': "05",
+      'Junho': "06",
+      'Julho': "07",
+      'Agosto': "08",
+      'Setembro': "09",
+      'Outubro': "10",
+      'Novembro': "11",
+      'Dezembro': "12"
+    };
+
+    return meses[mes];
+  }
+
+  mesParaNumeroInteiro(mes: string): number {
+    const meses: { [key: string]: number } = {
+      'Janeiro': 1,
+      'Fevereiro': 2,
+      'Março': 3,
+      'Abril': 4,
+      'Maio': 5,
+      'Junho': 6,
+      'Julho': 7,
+      'Agosto': 8,
+      'Setembro': 9,
+      'Outubro': 10,
+      'Novembro': 11,
+      'Dezembro': 12
+    };
+
+    return meses[mes];
+  }
+
+  get calcularTotalConsumoAgua(): number {
+    return this.consumoAguaTable.reduce((total, consumo) => total + consumo.quantidade, 0);
+  }
+
+  get calcularTotalConsumoEnergia(): number {
+    return this.consumoEnergiaTable.reduce((total, consumo) => total + consumo.quantidade, 0) / 3600;
+  }
+
+  calcularPrecoEnergia(conta: IUtilizador): number {
+    const horaAtual = new Date();
+
+    if (horaAtual >= new Date(`2000-01-01T${conta.horarioDeP1Energia}`) &&
+      horaAtual <= new Date(`2000-01-01T${conta.horarioAteP1Energia}`)) {
+      return conta.precoP1Energia;
+    } else if (horaAtual >= new Date(`2000-01-01T${conta.horarioDeP2Energia}`) &&
+      horaAtual <= new Date(`2000-01-01T${conta.horarioAteP2Energia}`)) {
+      return conta.precoP2Energia;
+    } else {
+      return conta.precoP3Energia;
     }
   }
 
